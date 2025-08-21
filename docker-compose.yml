@@ -7,6 +7,9 @@ services:
       - "3000:3000"
     environment:
       - NODE_ENV=production
+      - API_KEY=
+      - MAC_ADDRESS=
+      - IP_ADDRESS=
     restart: unless-stopped
     networks:
       - wol-network
