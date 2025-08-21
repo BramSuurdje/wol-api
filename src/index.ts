@@ -2,7 +2,7 @@ import serveEmojiFavicon from "stoker/middlewares/serve-emoji-favicon";
 import * as HttpStatusCodes from "stoker/http-status-codes";
 import notFound from "stoker/middlewares/not-found";
 import onError from "stoker/middlewares/on-error";
-import { pinoLogger } from "hono-pino";
+import { logger, pinoLogger } from "hono-pino";
 import wol from "wake_on_lan";
 import { pino } from "pino";
 import { Hono } from "hono";
@@ -39,40 +39,41 @@ app.get("/", (c) => {
   return c.json({ message: "Wake-on-LAN API" }, HttpStatusCodes.OK);
 });
 
-app.post("/wake", (c) => {
+app.post("/wake", async (c) => {
   const apikey = c.req.header("x-api-key");
   if (apikey !== process.env.API_KEY) {
     return c.json({ error: "Invalid API key" }, HttpStatusCodes.UNAUTHORIZED);
   }
 
-  wol.wake(
-    macAddress,
-    {
-      address: ipAddress,
-    },
-    (err: Error | null) => {
-      if (err) {
-        console.error(err);
-        return c.json(
-          { error: "Failed to wake up" },
-          HttpStatusCodes.INTERNAL_SERVER_ERROR,
-        );
-      }
-
-      return c.json(
-        { message: "OK", timestamp: new Date().toISOString() },
-        HttpStatusCodes.OK,
-      );
-    },
-  );
-
-  return c.json(
-    {
-      message: "OK",
-      timestamp: new Date().toISOString(),
-    },
-    HttpStatusCodes.OK,
-  );
+  return new Promise((resolve) => {
+    wol.wake(
+      macAddress,
+      {
+        address: ipAddress,
+        port: 9, // Standard WOL port
+      },
+      (err: Error | null) => {
+        if (err) {
+          console.error("WOL Error:", err);
+          resolve(c.json(
+            { error: "Failed to wake up", details: err.message },
+            HttpStatusCodes.INTERNAL_SERVER_ERROR,
+          ));
+        }
+        else {
+          resolve(c.json(
+            { message: "OK", timestamp: new Date().toISOString() },
+            HttpStatusCodes.OK,
+          ));
+        }
+      },
+    );
+  });
 });
 
 export default app;
+
+// Start the server
+const port = process.env.PORT ? Number.parseInt(process.env.PORT) : 3000;
+
+export { port };
