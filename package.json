@@ -1,13 +1,19 @@
 {
-  "name": "WOL-API",
+  "name": "wol-api",
+  "version": "1.0.0",
+  "description": "Wake-on-LAN API",
+  "main": "src/index.ts",
+  "type": "module",
+  "author": "Bram Suurdje",
+  "license": "MIT",
   "scripts": {
     "dev": "bun run --hot src/index.ts"
   },
   "dependencies": {
     "hono": "^4.9.2",
     "hono-pino": "^0.10.2",
-    "http-status-codes": "^2.3.0",
     "pino": "^9.9.0",
+    "stoker": "^2.0.1",
     "wake_on_lan": "^1.0.0"
   },
   "devDependencies": {

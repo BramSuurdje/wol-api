@@ -1,17 +1,27 @@
 import { Hono } from "hono";
 import wol = require("wake_on_lan");
-import { StatusCodes } from "http-status-codes";
 import { pinoLogger } from "hono-pino";
 import pino = require("pino");
+import notFound from "stoker/middlewares/not-found";
+import onError from "stoker/middlewares/on-error";
+import serveEmojiFavicon from "stoker/middlewares/serve-emoji-favicon";
+import * as HttpStatusCodes from "stoker/http-status-codes";
 
-if (!process.env.API_KEY || !process.env.MAC_ADDRESS || !process.env.IP_ADDRESS) {
+if (
+  !process.env.API_KEY ||
+  !process.env.MAC_ADDRESS ||
+  !process.env.IP_ADDRESS
+) {
   throw new Error("Missing environment variables");
 }
 
 const macAddress = process.env.MAC_ADDRESS;
 const ipAddress = process.env.IP_ADDRESS;
 
-const app = new Hono({ strict: false });
+const app = new Hono({ strict: false })
+  .use(serveEmojiFavicon("⏰"))
+  .notFound(notFound)
+  .onError(onError);
 
 app.use(
   pinoLogger({
@@ -30,22 +40,10 @@ app.use(
   })
 );
 
-app.notFound((c) => {
-  return c.json({ error: "Not Found" }, StatusCodes.NOT_FOUND);
-});
-
-app.onError((err, c) => {
-  console.error(err);
-  return c.json(
-    { error: "Internal Server Error" },
-    StatusCodes.INTERNAL_SERVER_ERROR
-  );
-});
-
 app.post("/wake", (c) => {
   const apikey = c.req.header("x-api-key");
   if (apikey !== process.env.API_KEY) {
-    return c.json({ error: "Invalid API key" }, StatusCodes.UNAUTHORIZED);
+    return c.json({ error: "Invalid API key" }, HttpStatusCodes.UNAUTHORIZED);
   }
 
   wol.wake(
@@ -58,20 +56,20 @@ app.post("/wake", (c) => {
         console.error(err);
         return c.json(
           { error: "Failed to wake up" },
-          StatusCodes.INTERNAL_SERVER_ERROR
+          HttpStatusCodes.INTERNAL_SERVER_ERROR
         );
       }
 
       return c.json(
         { message: "OK", timestamp: new Date().toISOString() },
-        StatusCodes.OK
+        HttpStatusCodes.OK
       );
     }
   );
 
   return c.json(
     { message: "OK", timestamp: new Date().toISOString() },
-    StatusCodes.OK
+    HttpStatusCodes.OK
   );
 });
 
