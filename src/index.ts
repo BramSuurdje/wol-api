@@ -4,8 +4,12 @@ import { StatusCodes } from "http-status-codes";
 import { pinoLogger } from "hono-pino";
 import pino = require("pino");
 
-const macAddress = "9c:6b:00:17:78:68";
-const ipAddress = "10.0.1.1";
+if (!process.env.API_KEY || !process.env.MAC_ADDRESS || !process.env.IP_ADDRESS) {
+  throw new Error("Missing environment variables");
+}
+
+const macAddress = process.env.MAC_ADDRESS;
+const ipAddress = process.env.IP_ADDRESS;
 
 const app = new Hono({ strict: false });
 
@@ -40,7 +44,7 @@ app.onError((err, c) => {
 
 app.post("/wake", (c) => {
   const apikey = c.req.header("x-api-key");
-  if (apikey !== "jBqqNSgG2gYiGfYDI9dmyLL8nT5E9PnQDwpFbbZM4b") {
+  if (apikey !== process.env.API_KEY) {
     return c.json({ error: "Invalid API key" }, StatusCodes.UNAUTHORIZED);
   }
 
