@@ -1,16 +1,16 @@
-import { Hono } from "hono";
-import wol = require("wake_on_lan");
-import { pinoLogger } from "hono-pino";
-import pino = require("pino");
-import notFound from "stoker/middlewares/not-found";
-import onError from "stoker/middlewares/on-error";
 import serveEmojiFavicon from "stoker/middlewares/serve-emoji-favicon";
 import * as HttpStatusCodes from "stoker/http-status-codes";
+import notFound from "stoker/middlewares/not-found";
+import onError from "stoker/middlewares/on-error";
+import { pinoLogger } from "hono-pino";
+import wol from "wake_on_lan";
+import { pino } from "pino";
+import { Hono } from "hono";
 
 if (
-  !process.env.API_KEY ||
-  !process.env.MAC_ADDRESS ||
-  !process.env.IP_ADDRESS
+  !process.env.API_KEY
+  || !process.env.MAC_ADDRESS
+  || !process.env.IP_ADDRESS
 ) {
   throw new Error("Missing environment variables");
 }
@@ -31,13 +31,8 @@ app.use(
       transport: {
         target: "hono-pino/debug-log",
       },
-      timestamp: pino.stdTimeFunctions.unixTime,
-      serializers: {
-        req: pino.stdSerializers.req,
-        res: pino.stdSerializers.res,
-      },
     }),
-  })
+  }),
 );
 
 app.get("/", (c) => {
@@ -60,15 +55,15 @@ app.post("/wake", (c) => {
         console.error(err);
         return c.json(
           { error: "Failed to wake up" },
-          HttpStatusCodes.INTERNAL_SERVER_ERROR
+          HttpStatusCodes.INTERNAL_SERVER_ERROR,
         );
       }
 
       return c.json(
         { message: "OK", timestamp: new Date().toISOString() },
-        HttpStatusCodes.OK
+        HttpStatusCodes.OK,
       );
-    }
+    },
   );
 
   return c.json(
@@ -76,7 +71,7 @@ app.post("/wake", (c) => {
       message: "OK",
       timestamp: new Date().toISOString(),
     },
-    HttpStatusCodes.OK
+    HttpStatusCodes.OK,
   );
 });
 

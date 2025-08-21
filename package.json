@@ -1,11 +1,11 @@
 {
   "name": "wol-api",
+  "type": "module",
   "version": "1.0.0",
   "description": "Wake-on-LAN API",
-  "main": "src/index.ts",
-  "type": "module",
   "author": "Bram Suurdje",
   "license": "MIT",
+  "main": "src/index.ts",
   "scripts": {
     "dev": "bun run --hot src/index.ts",
     "lint": "eslint src",
@@ -19,9 +19,9 @@
     "wake_on_lan": "^1.0.0"
   },
   "devDependencies": {
+    "@antfu/eslint-config": "^5.2.1",
     "@types/bun": "latest",
     "@types/wake_on_lan": "^0.0.33",
-    "@antfu/eslint-config": "^5.2.1",
     "eslint": "^9.33.0",
     "eslint-plugin-format": "^1.0.1"
   }
