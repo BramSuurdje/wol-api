@@ -72,7 +72,10 @@ app.post("/wake", (c) => {
   );
 
   return c.json(
-    { message: "OK", timestamp: new Date().toISOString() },
+    {
+      message: "OK",
+      timestamp: new Date().toISOString(),
+    },
     HttpStatusCodes.OK
   );
 });
