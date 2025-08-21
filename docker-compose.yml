@@ -1,17 +1,11 @@
 services:
   wol-api:
     image: ghcr.io/bramsuurdje/wol-api:latest
-    ports:
-      - "3000:3000"
+    network_mode: host
     environment:
       - NODE_ENV=production
-      - API_KEY=
-      - MAC_ADDRESS=
-      - IP_ADDRESS=
+      - PORT=3000 # This is the port for the API
+      - API_KEY=your_api_key_here # This is the API key for the API
+      - MAC_ADDRESS=AA:BB:CC:DD:EE:FF # This is the MAC address of the target PC
+      - IP_ADDRESS=10.0.1.255 # This is the broadcast address for the subnet
     restart: unless-stopped
-    networks:
-      - wol-network
-
-networks:
-  wol-network:
-    driver: bridge
