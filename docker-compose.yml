@@ -1,0 +1,16 @@
+services:
+  wol-api:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "3000:3000"
+    environment:
+      - NODE_ENV=production
+    restart: unless-stopped
+    networks:
+      - wol-network
+
+networks:
+  wol-network:
+    driver: bridge
