@@ -40,6 +40,10 @@ app.use(
   })
 );
 
+app.get("/", (c) => {
+  return c.json({ message: "Wake-on-LAN API" }, HttpStatusCodes.OK);
+});
+
 app.post("/wake", (c) => {
   const apikey = c.req.header("x-api-key");
   if (apikey !== process.env.API_KEY) {
