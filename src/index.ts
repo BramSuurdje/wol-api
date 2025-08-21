@@ -28,7 +28,7 @@ app.use(
     pino: pino({
       base: null,
       level: process.env.NODE_ENV === "production" ? "info" : "debug",
-      transport: {
+      transport: process.env.NODE_ENV === "production" ? undefined : {
         target: "hono-pino/debug-log",
       },
     }),
