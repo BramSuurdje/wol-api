@@ -8,4 +8,10 @@ services:
       - API_KEY=your_api_key_here # This is the API key for the API
       - MAC_ADDRESS=AA:BB:CC:DD:EE:FF # This is the MAC address of the target PC
       - IP_ADDRESS=10.0.1.255 # This is the broadcast address for the subnet
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:3000/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 5s
     restart: unless-stopped
