@@ -2,7 +2,7 @@ import serveEmojiFavicon from "stoker/middlewares/serve-emoji-favicon";
 import * as HttpStatusCodes from "stoker/http-status-codes";
 import notFound from "stoker/middlewares/not-found";
 import onError from "stoker/middlewares/on-error";
-import { logger, pinoLogger } from "hono-pino";
+import { pinoLogger } from "hono-pino";
 import wol from "wake_on_lan";
 import { pino } from "pino";
 import { Hono } from "hono";
@@ -28,15 +28,25 @@ app.use(
     pino: pino({
       base: null,
       level: process.env.NODE_ENV === "production" ? "info" : "debug",
-      transport: process.env.NODE_ENV === "production" ? undefined : {
-        target: "hono-pino/debug-log",
-      },
+      transport: process.env.NODE_ENV === "production"
+        ? undefined
+        : {
+            target: "hono-pino/debug-log",
+          },
     }),
   }),
 );
 
 app.get("/", (c) => {
   return c.json({ message: "Wake-on-LAN API" }, HttpStatusCodes.OK);
+});
+
+app.get("/health", (c) => {
+  return c.json({
+    status: "healthy",
+    timestamp: new Date().toISOString(),
+    uptime: process.uptime(),
+  }, HttpStatusCodes.OK);
 });
 
 app.post("/wake", async (c) => {
